@@ -15,8 +15,8 @@ namespace arpack {  // begin arpack namespace
 
     template<class scalar_t>
     void mkl_sparse_create_coo(
-            sparse_matrix_t *A, const sparse_index_base_t indexing, const int rows, const int cols,
-            const int nnz, int *row_indx, int *col_indx, scalar_t *values, sparse_status_t *status);
+            sparse_matrix_t *A, sparse_index_base_t indexing, int rows, int cols,
+            int nnz, int *row_indx, int *col_indx, scalar_t *values, sparse_status_t *status);
 
     template<>
     void mkl_sparse_create_coo<double>(
@@ -54,7 +54,7 @@ namespace arpack {  // begin arpack namespace
     namespace {  // begin anonymous namespace
 
         template<typename scalar_t>
-        static void apply_eigsh_mkl(
+        void apply_eigsh_mkl(
                 const at::Tensor& A,
                 at::Tensor& val,
                 at::Tensor& vec,
@@ -103,7 +103,7 @@ namespace arpack {  // begin arpack namespace
 
         }
 
-        static void eigsh_mkl_kernel(
+        void eigsh_mkl_kernel(
                 const at::Tensor& A,
                 at::Tensor& val,
                 at::Tensor& vec,

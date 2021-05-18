@@ -69,7 +69,7 @@ namespace arpack {  // begin arpack namespace
     namespace {  // begin anonymous namespace
 
         template<typename scalar_t>
-        static void apply_eigsh(
+        void apply_eigsh(
                 const at::Tensor& A,
                 at::Tensor& val,
                 at::Tensor& vec,
@@ -216,7 +216,7 @@ namespace arpack {  // begin arpack namespace
             }
         }
 
-        static void eigsh_kernel(
+        void eigsh_kernel(
                 const at::Tensor& A,
                 at::Tensor& val,
                 at::Tensor& vec,
