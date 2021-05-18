@@ -5,7 +5,7 @@ setup(
     name='arpack',
     version="0.1",
     ext_modules=[
-        CppExtension('arpack', ['bind.cpp'])
+        CppExtension('arpack', ['src/bind.cpp'])
     ],
     cmdclass={
         'build_ext': BuildExtension
