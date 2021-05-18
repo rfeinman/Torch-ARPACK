@@ -79,11 +79,6 @@ namespace arpack {  // begin arpack namespace
                 const int max_iter,
                 const double _tol) {
 
-            TORCH_CHECK(A.is_cpu(), "A should be a CPU tensor.");
-            TORCH_CHECK(A.dim() == 2, "A should have 2 dimensions");
-            TORCH_CHECK(A.size(0) == A.size(1), "A should be square");
-
-            // scalar_t tol = 1.0e-4;
             scalar_t tol = (scalar_t) _tol;
             scalar_t lanczos_tol = 1.0e-7;
             int n = A.size(0);
