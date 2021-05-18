@@ -3,11 +3,9 @@
 //
 #include <torch/extension.h>
 #include <c10/util/irange.h>
-#include <pybind11/pybind11.h>
+
 #include <vector>
 #include <cmath>
-
-namespace py = pybind11;
 
 
 extern "C" void dstebz_(char *range, char *order, int *n, double *vl, double *vu, int *il, int *iu, double *abstol,
@@ -276,13 +274,3 @@ namespace arpack {  // begin arpack namespace
     }
 
 }  // end eigen namespace
-
-
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-    m.def("eigsh", &arpack::eigsh, "eigsh forward",
-          py::arg("A"),
-          py::arg("largest") = true,
-          py::arg("m") = 20,
-          py::arg("max_iter") = 500,
-          py::arg("tol") = 1.0e-4);
-}
