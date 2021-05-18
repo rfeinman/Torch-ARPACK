@@ -9,9 +9,11 @@ The motivation of Torch ARPACK is to augment the PyTorch library with fast, comp
 
 ### Appendix: CPU / CUDA partial eigensolver index
 
-Here I keep track of the available CPU/CUDA backend implementations for partial eigenvalue problems with large, sparse linear systems.
+Here I keep track of the available CPU & CUDA libraries for solving partial eigenvalue problems. Using LAPACK terminology, the specifier `range = 'I'` refers to the problem of locating a subset of eigenpairs by index (e.g. find the largest 5 pairs) and `range = 'V'` locating by value (e.g. find all eigenpairs with values in range [low, high].)
 
-#### Sparse solvers
+#### Approximate solvers
+
+Approximate algorithms for computing select eigenpairs rely on iterative subspace routines such as Arnoldi, Lanczos, and subspace iteration. These algorithms use only matrix-vector products and have a smaller memory footprint compared to exact routines. For matrices stored in *sparse* formats (e.g. coo, csr), approximate methods are the only available eigensolver routines. For matrices stored in *dense* format, approximate solvers often still provide a speed-up over exact methods in many cases.
 
  The most comprehensive existing solution is the Intel MKL extremal eigensolver (CPU only). For an overview of the MKL module, see [here](https://software.intel.com/content/www/us/en/develop/articles/intel-mkl-support-for-largestsmallest-eigenvalue-and-sparse-svd-problem.html). For a reference on the solver parameters, see [here](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-input-parameters-for-extremal-eigenvalue-problem.html).
 
@@ -36,9 +38,9 @@ Here I keep track of the available CPU/CUDA backend implementations for partial 
       - [cusolverSp\<t\>csreigs](https://docs.nvidia.com/cuda/cusolver/index.html#cusolver-lt-t-gt-csreigs) (standard; general) - Compute the number of eigenpairs that lie within the interval \[low, high\].
 
 
-#### Dense solvers
+#### Exact solvers
 
-In addition to sparse eigensolvers—which use fast subspace methods (e.g. Lanczos, Arnoldi, supspace iteration)—there are a handful of partial eigensolvers that operate on complete bases. Like the standard "full" eigensolvers (e.g. *?geev* and *?syev*), these algorithms begin with a complete Hessenberg/tridiagonal factorization. However, in the second phase—whereas "full" solvers perform a complete Schur decomposition—partial solvers find a subset of eigenpairs using various techniques that reduce the computational complexity.
+In addition to approximate eigensolvers—which solve for eigenpairs in an evolving subspace—there are a handful of *exact* partial eigensolvers that operate on complete bases. Like full-spectrum eigensolvers (e.g. ?geev and ?syev), these algorithms begin with a complete Hessenberg/tridiagonal factorization. However, in the second phase—whereas full solvers perform a complete Schur decomposition—partial solvers find a subset of eigenpairs using various techniques that reduce the computational complexity.
 
 - MKL
 
