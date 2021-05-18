@@ -94,9 +94,7 @@ namespace arpack {  // begin arpack namespace
             TORCH_INTERNAL_ASSERT(status == 0);
 
             struct matrix_descr descrA;
-            descrA.type = SPARSE_MATRIX_TYPE_SYMMETRIC;
-            descrA.mode = SPARSE_FILL_MODE_LOWER;
-            descrA.diag = SPARSE_DIAG_NON_UNIT;
+            descrA.type = SPARSE_MATRIX_TYPE_GENERAL;
 
             // ~~~~~ Execute eigensolver ~~~~~
             mkl_sparse_ev<scalar_t>(&which, pm, csrA, descrA, k0, &k, val.data_ptr<scalar_t>(),
@@ -125,7 +123,7 @@ namespace arpack {  // begin arpack namespace
       Krylov-Schur eigensolver
 
       Parameters:
-      * 'A' - coefficient matrix
+      * 'A' - symmetric coefficient matrix
       * 'largest' - whether to search for largest or smallest eigenpair
       * 'm' - number of Lanczos vectors to use
       * 'max_iter' - maximum number of iterations allowed
