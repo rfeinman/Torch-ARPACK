@@ -41,7 +41,7 @@ Here I keep track of the available CPU/CUDA backend implementations for extremal
 
 ### Appendix B: CPU / CUDA partial eigensolver index (DENSE)
 
-In addition to sparse eigensolvers—which use fast subspace methods (e.g. Lanczos, Arnoldi, supspace iteration)—there are a handful of partial eigensolvers that operate on the complete basis of the input matrix. Like the standard "full" eigensolvers (e.g. *?geev* and *?syev*), these algorithms begin with a complete Hessenberg/tridiagonal factorization. However, in the second phase—whereas "full" solvers perform a complete Schur decomposition—partial solvers find a subset of eigenpairs using various techniques that reduce the computational complexity.
+In addition to sparse eigensolvers—which use fast subspace methods (e.g. Lanczos, Arnoldi, supspace iteration)—there are a handful of partial eigensolvers that operate on complete bases. Like the standard "full" eigensolvers (e.g. *?geev* and *?syev*), these algorithms begin with a complete Hessenberg/tridiagonal factorization. However, in the second phase—whereas "full" solvers perform a complete Schur decomposition—partial solvers find a subset of eigenpairs using various techniques that reduce the computational complexity.
 
 #### MKL (CPU)
 
