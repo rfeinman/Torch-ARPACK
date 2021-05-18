@@ -43,18 +43,21 @@ In addition to sparse eigensolvers—which use fast subspace methods (e.g. Lancz
 - MKL
 
   - Routines (`range = 'I', 'V'`)
-    - ?syevr - Symmetric standard
-    - ?syevx - Symmetric standard
-    - ?sygvx - Symmetric generalized
+    - [?syevx](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/lapack-routines/lapack-least-squares-and-eigenvalue-problem-routines/lapack-least-squares-and-eigenvalue-problem-driver-routines/symmetric-eigenvalue-problems-lapack-driver-routines/syevx.html) (standard; symmetric) - Tridiagonal reduction --> bisection --> inverse iteration --> tridiagonal orthogonal transform.
+    - [?sygvx](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/lapack-routines/lapack-least-squares-and-eigenvalue-problem-routines/lapack-least-squares-and-eigenvalue-problem-driver-routines/generalized-symmetric-definite-eigenvalue-problems-lapack-driver-routines/sygvx.html#sygvx) (generalized; symmetric) - See above.
   
 - MAGMA
 
-  - Routines
+  - Routines (`range = 'I', 'V'`)
+    - [magma_?syevx](http://icl.cs.utk.edu/projectsfiles/magma/doxygen/group__magma__heevx.html) (standard; symmetric) - QR iteration algorithm.
+    - [magma_?sygvx](http://icl.cs.utk.edu/projectsfiles/magma/doxygen/group__magma__hegvx.html)  (generalized; symmetric) - See above.
+    - [magma_?syevdx](http://icl.cs.utk.edu/projectsfiles/magma/doxygen/group__magma__heevdx.html) (standard; symmetric) - Divide-and-conquer algorithm.
+    - [magma_?sygvdx](http://icl.cs.utk.edu/projectsfiles/magma/doxygen/group__magma__hegvdx.html) (generalized; symmetric) - See above.
 
 - CuSOLVER
 
   - Routines (`range = 'I', 'V'`)
-    - [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDnXsyevdx) - Symmetric standard
-    - (legacy) [cusolverDn\<t\>sygvdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDN-lt-t-gt-sygvdx) - Symmetric generalized
+    - [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDnXsyevdx) (standard; symmetric)
+    - [cusolverDn\<t\>sygvdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDN-lt-t-gt-sygvdx) (generalized; symmetric)
 
 
