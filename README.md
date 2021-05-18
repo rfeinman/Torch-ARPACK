@@ -7,50 +7,54 @@ When working with large linear systems, it is useful to access one or a handful 
 
 The motivation of Torch ARPACK is to augment the PyTorch library with fast, compiled eigensolvers based on restarted Arnoldi methods. The current version includes a single function `eigsh` which is limited to symmetric matrices. At each step, the algorithm performs a Lanczos factorization and calls LAPACK routines *?stebz* and *?stein* to compute a partial Schur decomposition of the resulting tridiagonal system. There are no MAGMA analogues to *?stebz* and *?stein* that I'm aware of; therefore, the current implementation is limited to CPU.
 
-### Appendix A: CPU / CUDA partial eigensolver index (SPARSE)
+### Appendix: CPU / CUDA partial eigensolver index
 
-Here I keep track of the available CPU/CUDA backend implementations for partial eigenvalue problems with large, sparse linear systems. The most comprehensive existing solution is the Intel MKL extremal eigensolver (CPU only). For an overview of the MKL module, see [here](https://software.intel.com/content/www/us/en/develop/articles/intel-mkl-support-for-largestsmallest-eigenvalue-and-sparse-svd-problem.html). For a reference on the solver parameters, see [here](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-input-parameters-for-extremal-eigenvalue-problem.html).
+Here I keep track of the available CPU/CUDA backend implementations for partial eigenvalue problems with large, sparse linear systems.
 
-#### MKL (CPU)
+#### Sparse solvers
+
+ The most comprehensive existing solution is the Intel MKL extremal eigensolver (CPU only). For an overview of the MKL module, see [here](https://software.intel.com/content/www/us/en/develop/articles/intel-mkl-support-for-largestsmallest-eigenvalue-and-sparse-svd-problem.html). For a reference on the solver parameters, see [here](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-input-parameters-for-extremal-eigenvalue-problem.html).
+
+- MKL
   
-- Routines (`range = 'I'`)
-    - [mkl_sparse_?_ev](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-interfaces-to-find-largest-smallest-eigenvalues/mkl-sparse-ev.html) (standard; symmetric) - Solve for extremal eigenvalues using (1) Krylov-Schur or (2) FEAST-based subspace projection.
-    - [mkl_sparse_?_gv](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-interfaces-to-find-largest-smallest-eigenvalues/mkl-sparse-gv.html) (generalized; symmetric) - Solve for extremal eigenvalues using (1) Krylov-Schur, or (2) FEAST-based subspace projection. 
-  
-- Routines (`range = 'V'`)
-  - TODO
+  - Routines (`range = 'I'`)
+      - [mkl_sparse_?_ev](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-interfaces-to-find-largest-smallest-eigenvalues/mkl-sparse-ev.html) (standard; symmetric) - Solve for extremal eigenvalues using (1) Krylov-Schur or (2) FEAST-based subspace projection.
+      - [mkl_sparse_?_gv](https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top/extended-eigensolver-routines/extended-eigensolver-interfaces-for-extremal-eigenvalues-singular-values/extended-eigensolver-interfaces-to-find-largest-smallest-eigenvalues/mkl-sparse-gv.html) (generalized; symmetric) - Solve for extremal eigenvalues using (1) Krylov-Schur, or (2) FEAST-based subspace projection. 
     
-#### MAGMA (CUDA)
-
-- Routines (`range = 'I'`)
-    - [magma_?lobpcg](http://icl.cs.utk.edu/projectsfiles/magma/doxygen/group__magmasparse__ssyev.html) (standard; symmetric positive-definite) - Solve for extremal eigenvalues via LOBPCG.
+  - Routines (`range = 'V'`)
+    - TODO
     
-#### CuSOLVER (CUDA)
+- MAGMA
 
-- Routines (`range = 'V'`)
-    - [cusolverSp\<t\>csreigvsi](https://docs.nvidia.com/cuda/cusolver/index.html#cusolver-lt-t-gt-csreigsi) (standard; general) - Given an initial eigenvalue estimate, solve for the nearest eigenpair using inverse iteration.
-    - [cusolverSp\<t\>csreigs](https://docs.nvidia.com/cuda/cusolver/index.html#cusolver-lt-t-gt-csreigs) (standard; general) - Compute the number of eigenpairs that lie within the interval \[low, high\].
+  - Routines (`range = 'I'`)
+      - [magma_?lobpcg](http://icl.cs.utk.edu/projectsfiles/magma/doxygen/group__magmasparse__ssyev.html) (standard; symmetric positive-definite) - Solve for extremal eigenvalues via LOBPCG.
+    
+- CuSOLVER
+
+  - Routines (`range = 'V'`)
+      - [cusolverSp\<t\>csreigvsi](https://docs.nvidia.com/cuda/cusolver/index.html#cusolver-lt-t-gt-csreigsi) (standard; general) - Given an initial eigenvalue estimate, solve for the nearest eigenpair using inverse iteration.
+      - [cusolverSp\<t\>csreigs](https://docs.nvidia.com/cuda/cusolver/index.html#cusolver-lt-t-gt-csreigs) (standard; general) - Compute the number of eigenpairs that lie within the interval \[low, high\].
 
 
-### Appendix B: CPU / CUDA partial eigensolver index (DENSE)
+#### Dense solvers
 
 In addition to sparse eigensolvers—which use fast subspace methods (e.g. Lanczos, Arnoldi, supspace iteration)—there are a handful of partial eigensolvers that operate on complete bases. Like the standard "full" eigensolvers (e.g. *?geev* and *?syev*), these algorithms begin with a complete Hessenberg/tridiagonal factorization. However, in the second phase—whereas "full" solvers perform a complete Schur decomposition—partial solvers find a subset of eigenpairs using various techniques that reduce the computational complexity.
 
-#### MKL (CPU)
+- MKL
 
-- Routines (`range = 'I', 'V'`)
-  - ?syevr - Symmetric standard
-  - ?syevx - Symmetric standard
-  - ?sygvx - Symmetric generalized
+  - Routines (`range = 'I', 'V'`)
+    - ?syevr - Symmetric standard
+    - ?syevx - Symmetric standard
+    - ?sygvx - Symmetric generalized
   
-#### MAGMA (CUDA)
+- MAGMA
 
-- Routines
+  - Routines
 
-#### CuSOLVER (CUDA)
+- CuSOLVER
 
-- Routines (`range = 'I', 'V'`)
-  - [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDnXsyevdx) - Symmetric standard
-  - (legacy) [cusolverDn\<t\>sygvdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDN-lt-t-gt-sygvdx) - Symmetric generalized
+  - Routines (`range = 'I', 'V'`)
+    - [cusolverDnXsyevdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDnXsyevdx) - Symmetric standard
+    - (legacy) [cusolverDn\<t\>sygvdx](https://docs.nvidia.com/cuda/cusolver/index.html#cuSolverDN-lt-t-gt-sygvdx) - Symmetric generalized
 
 
