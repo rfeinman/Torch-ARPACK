@@ -68,20 +68,6 @@ namespace arpack {  // begin arpack namespace
 
     namespace {  // begin anonymous namespace
 
-        /*
-          Solve for the extremal eigenpair of a symmetric matrix using restarted Lanczos.
-
-          Input args:
-          * 'A' - symmetric coefficient matrix
-          * 'largest' - whether to search for largest or smallest eigenpair
-          * '_m' - number of Lanczos vectors to use
-          * 'max_iter' - maximum number of iterations allowed
-          * '_tol' - convergence tolerance on the norm ||A * x - lambda * x||_2
-          Output args (modified in-place):
-          * 'val' - solution eigenvalue buffer
-          * 'vec' - solution eigenvector buffer
-          * 'n_iter' - number of iterations that ran
-        */
         template<typename scalar_t>
         static void apply_eigsh(
                 const at::Tensor& A,
@@ -252,7 +238,20 @@ namespace arpack {  // begin arpack namespace
     } // end anonymous namespace
 
 
-    // returns (eig_val, eig_vec, n_iter)
+    /*
+      Solve for the extremal eigenpair of a symmetric matrix using restarted Lanczos.
+
+      Parameters:
+      * 'A' - symmetric coefficient matrix
+      * 'largest' - whether to search for largest or smallest eigenpair
+      * 'm' - number of Lanczos vectors to use
+      * 'max_iter' - maximum number of iterations allowed
+      * 'tol' - convergence tolerance on the norm ||A * x - lambda * x||_2
+      Returns:
+      * 'val' - solution eigenvalue buffer
+      * 'vec' - solution eigenvector buffer
+      * 'n_iter' - number of iterations that were run
+    */
     std::tuple<at::Tensor, at::Tensor, int> eigsh(
             const at::Tensor& A,
             const bool largest = true,
