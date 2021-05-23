@@ -20,7 +20,7 @@ There are two functions currently implemented: `arpack.eigsh` and `argpack.eigsh
 
 ### Appendix: CPU / CUDA partial eigensolver index
 
-Here I keep track of the available CPU & CUDA libraries for solving partial eigenvalue problems. Using LAPACK terminology, the specifier `range = 'I'` refers to the problem of locating a subset of eigenpairs by index (e.g. find the largest 5 pairs) and `range = 'V'` locating by value (e.g. find all eigenpairs with values in range [low, high].)
+Here I keep track of the available CPU & CUDA libraries for solving partial eigenvalue problems. Using LAPACK terminology, the specifier `range = 'I'` refers to the problem of locating a subset of eigenpairs by index (e.g. find the largest 5 pairs) and `range = 'V'` locating by value (e.g. find all eigenpairs with values in range [low, high]). All tools currently implemented in Torch ARPACK concern the former.
 
 #### Approximate solvers
 
