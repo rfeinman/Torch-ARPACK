@@ -101,6 +101,10 @@ namespace arpack {  // begin arpack namespace
                                     vec.data_ptr<scalar_t>(), res, &status);
             TORCH_CHECK(status == 0, "non-zero sparse status");
 
+            // TODO: is this necessary?
+            mkl_sparse_destroy(csrA);
+            mkl_sparse_destroy(cooA);
+
         }
 
         void eigsh_mkl_kernel(
