@@ -251,8 +251,8 @@ namespace arpack {  // begin arpack namespace
             const at::Tensor& A,
             const bool largest = true,
             const int m = 20,
-            const int max_iter = 1000,
-            const double tol = 1.0e-4) {
+            const int max_iter = 10000,
+            const double tol = 1.0e-5) {
 
         TORCH_CHECK(!A.is_cuda(), "A should be a CPU tensor.");
         TORCH_CHECK(A.dim() == 2, "A should have 2 dimensions");
