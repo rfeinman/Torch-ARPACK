@@ -2,7 +2,7 @@
 
 Torch ARPACK is a PyTorch C++ extension for solving large-scale eigenvalue problems. It is inspired by the [ARPACK](https://www.caam.rice.edu/software/ARPACK/) Fortran library and corresponding [SciPy wrappers](https://docs.scipy.org/doc/scipy/reference/tutorial/arpack.html). The package uses efficient Arnoldi & Lanczos algorithms to identify one or a few* desired eigenpairs of a matrix.
 
-Author: Reuben Feinman
+__Author__: Reuben Feinman
 
 *At the moment, only a single eigenpair is supported. Extensions for multiple pairs are in the works.
 
