@@ -18,7 +18,7 @@ There are two functions currently implemented: `arpack.eigsh` and `argpack.eigsh
 1. `arpack.eigsh` - This function represents my own custom implementation of the explicitly restarted Lanczos method. It is very fast and should be the default for most cases. Note, however, that the algorithm has not yet been rigorously tested.
 2. `argpack.eigsh_mkl` - This function wraps the [Intel MKL implementation](https://software.intel.com/content/www/us/en/develop/articles/intel-mkl-support-for-largestsmallest-eigenvalue-and-sparse-svd-problem.html) of the Krylov-Schur algorithm for extremal eigenvalue problems. From a quick read of the Krylov-Schur paper, the algorithm appears very similar to my own (but MKL is not open-source, so who knows). In early benchmarks the implementation is roughly 2x slower than mine. Being an Intel-backed product, however, it is likely more reliable at the current time.
 
-For an example of how to use these two functions, see `test.py`.
+For an example of how to use these two functions, see `test.py`. To benchmark the runtime performance of these functions against alternatives from native PyTorch, see `scripts/benchmark`.
 
 ### Appendix: CPU / CUDA partial eigensolver index
 
