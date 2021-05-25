@@ -31,6 +31,9 @@ def eigen_solve(A, mode):
         # For some reason scipy's eigsh requires slightly smaller tolerance
         # (1e-5 vs 1e-4) to reach equiavelent accuracy
         return splinalg.eigsh(A.numpy(), k=1, which="LA", tol=1e-5)
+    elif mode == 'scipy_lobpcg':
+        X = A.new_empty(A.size(0), 1).normal_()
+        return splinalg.lobpcg(A.numpy(), X.numpy(), largest=True, tol=1e-4)
     else:
         raise ValueError
 
@@ -47,7 +50,7 @@ def sample_symmetric(dim, mean=0, std=10, **kwargs):
 num_threads = torch.get_num_threads()
 modes = ['torch_eigh', 'torch_lobpcg', 'arpack_eigsh', 'arpack_eigsh_mkl']
 if has_scipy:
-    modes += ['scipy_eigsh']
+    modes += ['scipy_eigsh', 'scipy_lobpcg']
 results = []
 for dim in [256, 512, 1024, 2048]:
     A = sample_symmetric(dim, dtype=DTYPE)
