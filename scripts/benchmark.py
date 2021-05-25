@@ -17,6 +17,7 @@ DTYPE = torch.float32 if args.precision == 'single' else torch.float64
 torch.manual_seed(args.seed)
 
 
+@torch.no_grad()
 def eigen_solve(A, mode):
     """solve for eigenpairs using a specified method"""
     if mode == 'arpack_eigsh':
