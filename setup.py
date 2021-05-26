@@ -1,11 +1,12 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from torch.utils.cpp_extension import CppExtension, BuildExtension
 
 setup(
     name='arpack',
     version="0.1",
+    packages=find_packages(),
     ext_modules=[
-        CppExtension('arpack', ['src/bind.cpp'])
+        CppExtension('arpack._C', ['src/bind.cpp'])
     ],
     cmdclass={
         'build_ext': BuildExtension
