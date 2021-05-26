@@ -2,6 +2,7 @@ import argparse
 import torch
 import torch.utils.benchmark as benchmark
 import arpack
+from arpack.utils import sample_symmetric
 try:
     from scipy.sparse import linalg as splinalg
     has_scipy = True
@@ -37,15 +38,6 @@ def eigen_solve(A, mode):
         return splinalg.lobpcg(A.numpy(), X.numpy(), largest=True, tol=1e-4)
     else:
         raise ValueError
-
-
-def sample_symmetric(dim, mean=0, std=10, **kwargs):
-    """generate a random symmetric matrix with a particular eigenvalue distribution"""
-    Q, R = torch.linalg.qr(torch.randn(dim, dim, **kwargs))
-    Q.mul_(R.diagonal().sign().view(1, -1))
-    e = torch.empty(dim, **kwargs).normal_(mean, std)
-    A = Q @ torch.diag(e) @ Q.T
-    return A
 
 
 num_threads = torch.get_num_threads()
