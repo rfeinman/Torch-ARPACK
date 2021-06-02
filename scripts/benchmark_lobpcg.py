@@ -3,7 +3,7 @@ Naming convention for matrix variables:
     a_<module>
 - module: {pt, sp} whether the matrix is a PyTorch or SciPy object
 
-CSR matrices can be converted to dense as follows:
+Sparse matrices can be converted to dense as follows:
     (PyTorch) a.to_dense()
     (SciPy) a.toarray()
 
@@ -14,22 +14,21 @@ from scipy import sparse
 import torch
 import torch.utils.benchmark as benchmark
 
-# scipy/numpy use float64 by default, so we will set torch as the same
-# for an equal comparison
-torch.set_default_dtype(torch.float64)
-
-# parse args
 parser = argparse.ArgumentParser()
 parser.add_argument('--format', type=str, choices=['coo', 'csr'], default='csr')
 args = parser.parse_args()
 
-# check for CSR support
+# if CSR format is requested, check torch version
 if args.format == 'csr' and 'sparse_csr_tensor' not in torch.__dict__:
     raise RuntimeError('Cannot use CSR format with this pytorch distribution.')
 
 # if MKL is available, we use int32 CSR indices to enable fast MKL-based matvec
 # (ignored when format='coo')
 USE_INT32 = torch.backends.mkl.is_available()
+
+# scipy/numpy use float64 by default, so we will set torch as the same
+# for an equal comparison
+torch.set_default_dtype(torch.float64)
 
 
 # ==== Helper utilities ====
