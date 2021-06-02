@@ -1,17 +1,15 @@
 """
 Naming convention for matrix variables:
-    a_<layout>_<module>
-- layout: {dense, csr} whether the matrix is in dense or sparse-CSR format
+    a_<module>
 - module: {pt, sp} whether the matrix is a PyTorch or SciPy object
 
 CSR matrices can be converted to dense as follows:
     (PyTorch) a.to_dense()
     (SciPy) a.toarray()
 
-Note: use int32 CSR indices for faster matvec with MKL-enabled pytorch
-
 """
 import argparse
+import numpy as np
 from scipy import sparse
 import torch
 import torch.utils.benchmark as benchmark
@@ -22,24 +20,39 @@ torch.set_default_dtype(torch.float64)
 
 # parse args
 parser = argparse.ArgumentParser()
-parser.add_argument('--int', type=str, choices=['int32', 'int64'], default='int32')
+parser.add_argument('--format', type=str, choices=['coo', 'csr'], default='csr')
 args = parser.parse_args()
 
-USE_INT32 = (args.int == 'int32') and torch.backends.mkl.is_available()
+# check for CSR support
+if args.format == 'csr' and 'sparse_csr_tensor' not in torch.__dict__:
+    raise RuntimeError('Cannot use CSR format with this pytorch distribution.')
+
+# if MKL is available, we use int32 CSR indices to enable fast MKL-based matvec
+# (ignored when format='coo')
+USE_INT32 = torch.backends.mkl.is_available()
 
 
 # ==== Helper utilities ====
 
-def _torch_csr_from_scipy(a_csr_sp):
-    assert sparse.isspmatrix_csr(a_csr_sp)
-    int_t = torch.int32 if USE_INT32 else torch.int64
-    a_csr_pt = torch.sparse_csr_tensor(
-        crow_indices=torch.from_numpy(a_csr_sp.indptr).to(int_t),
-        col_indices=torch.from_numpy(a_csr_sp.indices).to(int_t),
-        values=torch.from_numpy(a_csr_sp.data),
-        size=a_csr_sp.shape
-    )
-    return a_csr_pt
+def _torch_from_scipy(a):
+    """convert a scipy sparse matrix to a torch sparse matrix"""
+    if args.format == 'csr':
+        assert sparse.isspmatrix_csr(a)
+        return torch.sparse_csr_tensor(
+            crow_indices=a.indptr.astype(np.int32 if USE_INT32 else np.int64),
+            col_indices=a.indices.astype(np.int32 if USE_INT32 else np.int64),
+            values=a.data,
+            size=a.shape
+        )
+    elif args.format == 'coo':
+        assert sparse.isspmatrix_coo(a)
+        return torch.sparse_coo_tensor(
+            indices=(a.row, a.col),
+            values=a.data,
+            size=a.shape
+        )
+    else:
+        raise ValueError
 
 
 def _sample_symmetric(dim, mean=0, std=10, **kwargs):
@@ -60,23 +73,23 @@ def _sample_symmetric(dim, mean=0, std=10, **kwargs):
 def gen_diag(dim):
     """Sparse-CSR diagonal matrix"""
     diag = torch.randn(dim)
-    a_csr_sp = sparse.diags(diag.numpy(), format='csr')
-    a_csr_pt = _torch_csr_from_scipy(a_csr_sp)
-    return a_csr_pt, a_csr_sp
+    a_sp = sparse.diags(diag.numpy(), format=args.format)
+    a_pt = _torch_from_scipy(a_sp)
+    return a_pt, a_sp
 
 
 def gen_block_diag(dim, num_blocks=2):
     """Sparse-CSR block diagonal matrix"""
     blocks = [_sample_symmetric(dim // num_blocks) for _ in range(num_blocks)]
-    a_csr_sp = sparse.block_diag([b.numpy() for b in blocks], format='csr')
-    a_csr_pt = _torch_csr_from_scipy(a_csr_sp)
-    return a_csr_pt, a_csr_sp
+    a_sp = sparse.block_diag([b.numpy() for b in blocks], format=args.format)
+    a_pt = _torch_from_scipy(a_sp)
+    return a_pt, a_sp
 
 
 # ==== Experiment code ====
 
 def run_lobpcg_comparison(label, generator, generator_settings, k=5, largest=True, tol=1e-5):
-    label = '{} (k={}, largest={})'.format(label, k, largest)
+    label = '{} {} (k={}, largest={})'.format(args.format.upper(), label, k, largest)
 
     results = []
     for kwargs in generator_settings:
