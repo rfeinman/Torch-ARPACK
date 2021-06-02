@@ -39,23 +39,21 @@ torch.set_default_dtype(torch.float64)
 
 def _torch_from_scipy(a):
     """convert a scipy sparse matrix to a torch sparse matrix"""
-    if args.format == 'csr':
-        assert sparse.isspmatrix_csr(a)
+    if sparse.isspmatrix_csr(a):
         return torch.sparse_csr_tensor(
-            crow_indices=a.indptr.astype(np.int32 if USE_INT32 else np.int64),
-            col_indices=a.indices.astype(np.int32 if USE_INT32 else np.int64),
-            values=a.data,
+            crow_indices=a.indptr.astype(np.int32 if USE_INT32 else np.int64).copy(),
+            col_indices=a.indices.astype(np.int32 if USE_INT32 else np.int64).copy(),
+            values=a.data.copy(),
             size=a.shape
         )
-    elif args.format == 'coo':
-        assert sparse.isspmatrix_coo(a)
+    elif sparse.isspmatrix_coo(a):
         return torch.sparse_coo_tensor(
-            indices=(a.row, a.col),
-            values=a.data,
+            indices=(a.row.copy(), a.col.copy()),
+            values=a.data.copy(),
             size=a.shape
         )
     else:
-        raise ValueError
+        raise ValueError('invalid input type {} for _torch_from_scipy'.format(type(a)))
 
 
 def _sample_symmetric(dim, mean=0, std=10, **kwargs):
