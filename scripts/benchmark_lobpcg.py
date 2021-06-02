@@ -19,8 +19,12 @@ parser.add_argument('--format', type=str, choices=['coo', 'csr'], default='csr')
 args = parser.parse_args()
 
 # if CSR format is requested, check torch version
-if args.format == 'csr' and 'sparse_csr_tensor' not in torch.__dict__:
-    raise RuntimeError('Cannot use CSR format with this pytorch distribution.')
+if args.format == 'csr':
+    if 'sparse_csr_tensor' not in torch.__dict__:
+        raise RuntimeError('Cannot use CSR format with this pytorch distribution.')
+    import platform
+    if 'macOS' in platform.platform():
+        raise RuntimeError('CSR matvec is not supported on macOS.')
 
 # if MKL is available, we use int32 CSR indices to enable fast MKL-based matvec
 # (ignored when format='coo')
