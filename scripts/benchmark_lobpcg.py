@@ -59,8 +59,7 @@ def _torch_from_scipy(a):
 
 
 def _sample_symmetric(dim, mean=0, std=10, **kwargs):
-    """generate a random symmetric matrix with a particular eigenvalue
-    distribution"""
+    """generate a random symmetric matrix"""
     # sample random orthogonal matrix (uniformly)
     Q, R = torch.linalg.qr(torch.randn(dim, dim, **kwargs))
     Q.mul_(R.diagonal().sign().view(1, -1))
@@ -74,7 +73,7 @@ def _sample_symmetric(dim, mean=0, std=10, **kwargs):
 # ==== Matrix generators ====
 
 def gen_diag(dim):
-    """Sparse-CSR diagonal matrix"""
+    """generate sparse diagonal matrix"""
     diag = torch.randn(dim)
     a_sp = sparse.diags(diag.numpy(), format=args.format)
     a_pt = _torch_from_scipy(a_sp)
@@ -82,7 +81,7 @@ def gen_diag(dim):
 
 
 def gen_block_diag(dim, num_blocks=2):
-    """Sparse-CSR block diagonal matrix"""
+    """generate sparse block diagonal matrix"""
     blocks = [_sample_symmetric(dim // num_blocks) for _ in range(num_blocks)]
     a_sp = sparse.block_diag([b.numpy() for b in blocks], format=args.format)
     a_pt = _torch_from_scipy(a_sp)
