@@ -31,11 +31,13 @@ class EigshMKL(Function):
 
 
 def eigsh(A, largest=True, m=20, max_iter=10000, tol=1e-5):
+    """Compiled eigsh (custom implementation)"""
     e, v, n_iter = Eigsh.apply(A, largest, m, max_iter, tol)
     return e, v, n_iter
 
 
 def eigsh_mkl(A, largest=True, m=20, max_iter=10000, tol_dps=5):
+    """Compiled eigsh based on Intel MKL's extremal eigensolver"""
     e, v = EigshMKL.apply(A, largest, m, max_iter, tol_dps)
     return e, v
 
@@ -47,7 +49,7 @@ def eigsh_py(A,
              tol: float = 1e-5,
              seed: Optional[int] = None
              ) -> Tuple[Tensor, Tensor, int]:
-    """pure-python variant of eigsh"""
+    """Pure-python variant of eigsh"""
 
     if seed is not None:
         torch.manual_seed(seed)
@@ -101,7 +103,7 @@ def eigsh_py(A,
             w[0] = T[0, 0]
             break
         elif mk != m:
-            # lanczos factorization exited early.
+            # Lanczos factorization exited early.
             # We will compute eigval/vec and exit.
             V = V[:mk]
             T = T[:mk, :mk].contiguous()
@@ -109,7 +111,11 @@ def eigsh_py(A,
             eigvecs = eigvecs[:mk, :mk].contiguous().t()
             z = z[:mk]
 
-        # compute largest/smallest eigenpair of T
+        # Compute largest/smallest eigenpair of T
+        # TODO: this computation step could be made much more efficient
+        #  by the following:
+        #     1. Capitalize on the tridiagonal structure of T
+        #     2. Only compute the eigenpairs we need
         if torch.jit.is_scripting():
             torch.linalg.eigh(T, eigvals=eigvals, eigvecs=eigvecs)
         else:
