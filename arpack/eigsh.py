@@ -86,13 +86,13 @@ def eigsh_py(A,
             torch.matmul(A, V[i], out=r)
             if i > 0:
                 r.sub_(beta * V[i-1])
-            T[i, i] = torch.dot(V[i], r)
+            torch.dot(V[i], r, out=T[i, i])
             r.sub_(T[i, i] * V[i])
-            beta = torch.linalg.norm(r)
-            if beta < 1e-10:
+            torch.linalg.norm(r, out=beta)
+            if beta < 1e-10:  # TODO: avoid GPU synchronization
                 mk = i + 1
                 break
-            if i+1 < m:
+            if i + 1 < m:
                 T[i, i+1] = beta
                 T[i+1, i] = beta
                 torch.div(r, beta, out=V[i+1])
@@ -132,7 +132,7 @@ def eigsh_py(A,
         # compute projection of eigvec back to R^n
         V[0] = torch.matmul(z, V)
 
-        if mk != m or beta * z[-1].abs() < tol:
+        if mk != m or beta * z[-1].abs() < tol:  # TODO: avoid GPU synchronization
             break
 
     return w, V[0], n_iter
