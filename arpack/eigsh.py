@@ -30,19 +30,29 @@ class EigshMKL(Function):
         raise NotImplementedError('backward is not yet implemented for `eigsh_mkl`.')
 
 
-def eigsh(A, largest=True, m=20, max_iter=10000, tol=1e-5):
+def eigsh(A: Tensor,
+          largest: bool = True,
+          m: int = 20,
+          max_iter: int = 10000,
+          tol: float = 1e-5
+          ) -> Tuple[Tensor, Tensor, int]:
     """Compiled eigsh (custom implementation)"""
     e, v, n_iter = Eigsh.apply(A, largest, m, max_iter, tol)
     return e, v, n_iter
 
 
-def eigsh_mkl(A, largest=True, m=20, max_iter=10000, tol_dps=5):
+def eigsh_mkl(A: Tensor,
+              largest: bool = True,
+              m: int = 20,
+              max_iter: int = 10000,
+              tol_dps: int = 5
+              ) -> Tuple[Tensor, Tensor]:
     """Compiled eigsh based on Intel MKL's extremal eigensolver"""
     e, v = EigshMKL.apply(A, largest, m, max_iter, tol_dps)
     return e, v
 
 
-def eigsh_py(A,
+def eigsh_py(A: Tensor,
              largest: bool = True,
              m: int = 20,
              max_iter: int = 10000,
