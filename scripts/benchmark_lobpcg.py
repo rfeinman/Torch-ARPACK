@@ -15,6 +15,7 @@ import torch
 import torch.utils.benchmark as benchmark
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--precision', type=str, choices=['single', 'double'], default='double')
 parser.add_argument('--format', type=str, choices=['coo', 'csr'], default='csr')
 args = parser.parse_args()
 
@@ -30,9 +31,10 @@ if args.format == 'csr':
 # (ignored when format='coo')
 USE_INT32 = torch.backends.mkl.is_available()
 
-# scipy/numpy use float64 by default, so we will set torch as the same
-# for an equal comparison
-torch.set_default_dtype(torch.float64)
+# set float type for the experiment.
+# NOTE: all numpy arrays in this script originate from torch, so this
+# will set the float type for scipy too.
+torch.set_default_dtype(torch.float64 if args.precision == 'double' else torch.float32)
 
 
 # ==== Helper utilities ====
