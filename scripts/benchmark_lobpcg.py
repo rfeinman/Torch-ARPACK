@@ -19,13 +19,14 @@ parser.add_argument('--precision', type=str, choices=['single', 'double'], defau
 parser.add_argument('--format', type=str, choices=['coo', 'csr'], default='csr')
 args = parser.parse_args()
 
-# if CSR format is requested, check torch version
+# if CSR format is requested, check pytorch/system compatibility
 if args.format == 'csr':
-    if 'sparse_csr_tensor' not in torch.__dict__:
-        raise RuntimeError('Cannot use CSR format with this pytorch distribution.')
-    import platform
-    if 'macOS' in platform.platform():
-        raise RuntimeError('CSR matvec is not supported on macOS.')
+    try:
+        _ = torch.matmul(torch.randn(5, 5).to_sparse_csr(), torch.randn(5))
+    except Exception as exc:
+        print("CSR unsupported!\nThis environment does not support PyTorch CSR format. "
+              "Run with COO as follows:\n\tpython benchmark_lobpcg.py --format=coo\n")
+        raise
 
 # if MKL is available, we use int32 CSR indices to enable fast MKL-based matvec
 # (ignored when format='coo')
